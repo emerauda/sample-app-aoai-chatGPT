@@ -64,18 +64,9 @@ jobs:
       - name: 🗝️ Azure Login
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            rg=$(az webapp list --query "[?name=='${{ secrets.AZURE_APP_SERVICE_NAME }}'].resourceGroup" --output tsv)
-            echo Setting SCM_DO_BUILD_DURING_DEPLOYMENT=false on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}
-            az webapp config appsettings set -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false -o none
-            echo Setting --startup-file=\"node server.js\" on app service ${{ secrets.AZURE_APP_SERVICE_NAME }}
-            az webapp config set --startup-file="node server.js" -n ${{ secrets.AZURE_APP_SERVICE_NAME }} -g $rg -o none
-            sleep 10
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E6D7BC6B45AA4849A057C3B22CBF8D6B }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D074020F158647B8974EB922B5889068 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8365FEFE1B6B4C16B0A8F512AA9462A0 }}
 
       - name: 🚀 Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
