@@ -6,36 +6,38 @@ name: Build and deploy Python app to Azure Web App - bdl-chat
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: 🌱 Checkout to the branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🍏 Set up Python version
+      - name: Set up Python version
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: ⚙️ Create and start virtual environment
+      - name: Create and start virtual environment
         run: |
           python -m venv venv
           source venv/bin/activate
       
-      - name: 📂 Install dependencies
+      - name: Install dependencies
         run: pip install -r requirements.txt
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
-      - name: 📦 Zip artifact for deployment
+      - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
-      - name: ⬆️ Upload artifact for deployment jobs
+      - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
           name: python-app
@@ -51,26 +53,29 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
-      - name: ⬇️ Download artifact from build job
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: python-app
 
-      - name: 🍏 Unzip artifact for deployment
+      - name: Unzip artifact for deployment
         run: unzip release.zip
+
       
-      - name: 🗝️ Azure Login
+      - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E6D7BC6B45AA4849A057C3B22CBF8D6B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D074020F158647B8974EB922B5889068 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_8365FEFE1B6B4C16B0A8F512AA9462A0 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_227FEE6B83F3488EBB9637B0C313AB61 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_727AEE0576454AD99B2C4D3CF88B652B }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_310DE335A55740D2B5FB37A9F57D973A }}
 
-      - name: 🚀 Deploy to Azure Web App
+      - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: ${{ secrets.AZURE_APP_SERVICE_NAME }}
+          app-name: 'bdl-chat'
           slot-name: 'Production'
+          
